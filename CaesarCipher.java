@@ -1,4 +1,3 @@
-
 public class CaesarCipher {
 	static double[] table = {8.2, 1.5, 2.8, 4.3, 12.7, 2.2, 2.0, 6.1, 7.0, 0.2, 0.8, 4.0, 2.4, 6.7,
 			7.5, 1.9, 0.1, 6.0, 6.3, 9.1, 2.8, 1.0, 2.4, 0.2, 2.0, 0.1};
@@ -90,55 +89,88 @@ public class CaesarCipher {
 		return counter;
 	}
 	
-	static double percent(int num1, int num2)
+	static double percent(int num, int num2)
 	{
-		return (((double)num1/(double)num2)*100);
-	}
-	static double[] freqs(String str) 
-	{
-		double[] freq = new double[str.length()];
-		
-		for(int i=0; i<str.length()-1; i++)
-		{
-			char c1 = str.charAt(i);
-			//System.out.println(c1);
-			char c2 = str.charAt(i+1);
-			
-			if(let2nat(c2) == 0)
-			{
-				freq[i] = (percent(let2nat(c2)+1, let2nat(c1)));	
-				System.out.println("if: "+freq[i]);
-				continue;
-			}
-			else if (let2nat(c1) == 0)
-			{
-				freq[i] = 0.0;
-				System.out.println("else if: " + freq[i]);
-				continue;
-			}
-			else
-			{
-				freq[i] = (percent(let2nat(c1), let2nat(c2)));	
-				System.out.println("else : " + freq[i]);
-				continue;
-			}
-			
-		}
-		
-		return freq;
+		return (((double)num/(double)num2)*100);
 	}
 	
+  static double[] freqs(String str) 
+	{
+		    double[] freqs = new double[26];
+	        char[] strArray = str.toCharArray();
+	        for (int i = 0; i < freqs.length; i++)
+	        {
+	            freqs[i] = percent(count(nat2let(i), str), str.length());
+	        }
+	        return freqs;
+	}
+	
+  static double[] rotate(int n, double[] table)
+	    {
+	        for(int i = 0; i < n; i++)
+	        {
+	            double temp = table[0];
+	            for (int j = 0; j < table.length - 1; j++)
+	            {
+	            	table[j] = table[j+1];
+	            }
+	            table[table.length - 1] = temp;
+	        }
+	        return table;
+	    }
+
+  static double chisqr(double[] os)
+	    {
+	        double sum = 0.0;
+	        for (int i = 0; i < os.length; i++)
+	        {
+	            sum += Math.pow((os[i] - table[i]), 2) / table[i];
+	        }
+	        return sum;
+	    }
+
+ static int position(double a, double[] list)
+	    {
+	        for (int i = 0; i < list.length; i++)
+	        {
+	            if (list[i] == a)
+	            {
+	                return i;
+	            }
+	        }
+	        return -1;
+	    }
+
+ static double findMinimum(double[] list)
+	    {
+	        double min = list[0];
+	        for (int i = 1; i < list.length; i++)
+	        {
+	            if (min > list[i])
+	            {
+	            	min = list[i];
+	            }
+	        }
+	            
+	        return min;
+	    }
+
+ static String crack(String str)
+	    {
+	        double[] chisqrValues = new double[26];
+	        for (int i = 0; i < chisqrValues.length; i++)
+	        {
+	            chisqrValues[i] = chisqr(rotate(i, freqs(str)));
+	        }
+	        
+	        int shiftAmt = position(findMinimum(chisqrValues), chisqrValues);
+	        return decode(shiftAmt, str);
+	    }
+
+
 	public static void main(String[] args)
 	{
-		System.out.println(let2nat('a'));
-		System.out.println(nat2let(0));
-		System.out.println(shift(3,'h'));
-		System.out.println(encode(3,"haskellisfun"));
-		System.out.println(decode(3, "kdvnhoolvixq"));
-		System.out.println(lowers("haskellisfun"));
-		System.out.println(count('s', "haskellisfun"));
-		System.out.println(percent(2, 12));
-		System.out.println(freqs("haskellisfun"));
+		
 	}
 	
 	
